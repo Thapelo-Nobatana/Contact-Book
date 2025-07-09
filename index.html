@@ -19,21 +19,30 @@
         function fetchContacts(){
             fetch(rootPath + "controller/get-contacts/")
             .then(function(response){
+                if (!response.ok) {
+                    throw new Error("Network response was not ok " + response.statusText);
+                }
                 return response.json();
             })
             .then(function(data){
-                displayOutput(data);
-                console.log(data)
+              
+                console.log( "Raw data from server: ",data);
+              displayOutput(data);
             })
+            .catch(function(error){
+                console.error("Error fetching contacts:", error);
+                document.getElementById("table").innerHTML = "Failed to load contacts.";
+            });
         }
         function displayOutput(data) {
           let  output = "<table>";
-             for(a in data) {
+             for(a of data) {
+                const avatar = a.avatar ? a.avatar : "default-avatar.png"; 
                 output += `
-                    <tr onclick="editContact(${data[a].id})">
-                        <td><img src="${rootPath}controller/uploads/${data[a].avatar}" width="40"/></td>
-                        <td><h5>${data[a].firstname}</h5></td>
-                        <td><h5>${data[a].lastname}</h5></td>
+                    <tr onclick="editContact(${a.id})">
+                        <td><img src="${rootPath}controller/uploads/${a.avatar}" width="40"/></td>
+                        <td><h5>${a.firstname}</h5></td>
+                        <td><h5>${a.lastname}</h5></td>
                     </tr>
                 `
             }
